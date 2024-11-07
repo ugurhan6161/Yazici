@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yazdırma Sayfası</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input[type="text"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 20px;
+        }
+        #printer-selection {
+            margin-top: 20px;
+        }
+        @media print {
+            body {
+                width: 80mm; /* 80mm kağıt genişliği */
+                margin: 0;
+                padding: 0;
+            }
+            #printer-selection, button {
+                display: none; /* Yazdırma sırasında gereksiz öğeler gizlensin */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>HİSAR KOLTUK VE PERDE TEMİZLİK HİZMETLERİ</h2>
+    <form id="customer-form">
+        <label for="customer-id">Müşteri ID:</label>
+        <input type="text" id="customer-id" name="customer-id" required>
+
+        <label for="customer-name">Müşteri Adı:</label>
+        <input type="text" id="customer-name" name="customer-name" required>
+
+        <label for="customer-phone">Müşteri Telefonu:</label>
+        <input type="tel" id="customer-phone" name="customer-phone" required>
+
+        <label for="customer-address">Müşteri Adresi:</label>
+        <textarea id="customer-address" name="customer-address" rows="4" required></textarea>
+
+        <label for="customer-company">Müşteri Firma:</label>
+        <input type="text" id="customer-company" name="customer-company" required>
+
+        <button type="button" onclick="printCustomerInfo()">Yazdır</button>
+    </form>
+
+    <div id="printer-selection">
+        <label for="printer">Yazıcı Seçin:</label>
+        <button type="button" onclick="selectPrinter()">Yazıcıları Bul</button>
+        <select id="printer" disabled>
+            <option value="">Yazıcı Seçin</option>
+        </select>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        function printCustomerInfo() {
+            var customerId = document.getElementById("customer-id").value;
+            var customerName = document.getElementById("customer-name").value;
+            var customerPhone = document.getElementById("customer-phone").value;
+            var customerAddress = document.getElementById("customer-address").value;
+            var customerCompany = document.getElementById("customer-company").value;
+
+            var printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Yazdır</title><style>@media print { body { width: 80mm; margin: 0; padding: 0; font-family: Arial, sans-serif; } }</style></head><body>');
+            printWindow.document.write('<h2>HİSAR KOLTUK VE PERDE TEMİZLİK HİZMETLERİ</h2>');
+            printWindow.document.write('<p><strong>Müşteri ID:</strong> ' + customerId + '</p>');
+            printWindow.document.write('<p><strong>Müşteri Adı:</strong> ' + customerName + '</p>');
+            printWindow.document.write('<p><strong>Müşteri Telefonu:</strong> ' + customerPhone + '</p>');
+            printWindow.document.write('<p><strong>Müşteri Adresi:</strong> ' + customerAddress + '</p>');
+            printWindow.document.write('<p><strong>Müşteri Firma:</strong> ' + customerCompany + '</p>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function selectPrinter() {
+            if ('bluetooth' in navigator) {
+                navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    filters: [{ services: ['printer'] }]
+                })
+                .then(device => {
+                    alert('Bağlanılan Yazıcı: ' + device.name);
+                    // Yazıcı seçildikten sonra yazdırma işlemi burada yapılabilir
+                })
+                .catch(error => {
+                    console.log('Yazıcı bulunamadı veya bağlantı hatası: ' + error);
+                });
+            } else {
+                alert('Tarayıcı Bluetooth API desteği sunmuyor.');
+            }
+        }
+    </script>
+
+</body>
+</html>
